@@ -1,4 +1,4 @@
-# Submission for the computational part of Problem Set 1 for E8069 Computational Macroeconomics
+# Submission for the computational part of Problem Set 2 for E8069 Computational Macroeconomics
 
 ## Team
 
@@ -21,13 +21,15 @@ After selecting the course kernel, please run the entire Jupyter notebook sequen
 ## Discussion of Question 2: 
 ### Question 2.2.b: 
 
-When we increase the resolution of the asset grid $N_a$, the error $e_W$ and the maximum Euler equation error for the on-grid VFI fall, while the errors for the remaining three methods remain unchanged despite the increase the resolution. Meanwhile, the compute time per iteration increases with the resolution of the grid for all methods. This observed behavior can be explained by the main difference between on-grid VFI and the other solvers. Unlike on-grid VFI, VFI off-grid, Time iteration and EGM not only use the grid points themselves, but also interpolations in between the grid points. The use of interpolates makes the gains from higher grid resolution redundant as the solvers can already obtain results in between grid points and are not restricted to the values of the grid points. 
+When we increase the resolution of the asset grid $N_a$, the error $e_W$ and the maximum Euler equation error for on-grid VFI fall. The policy error $e_W$ also decreases for Time Iteration, while the changes for the remaining methods are smaller or less consistent. Meanwhile, the compute time per iteration increases with the resolution of the grid for all methods.
 
-Surprisingly, the maximum Euler error increases for both off-grid VFI and time iteration when we increase the grid resolution. 
+This observed behavior can partly be explained by the main difference between on-grid VFI and the other solvers. Unlike on-grid VFI, VFI off-grid, Time Iteration and EGM not only use the grid points themselves, but also interpolations in between the grid points. The use of interpolates therefore reduces the dependence on the grid resolution, although it does not eliminate approximation errors.
+
+Surprisingly, the maximum Euler error increases for off-grid VFI when we increase the grid resolution, while it decreases for Time Iteration.
 
 ### Question 2.2.c: 
 
-The tightening in the convergence criteria by a factor of 100 decreases the policy error $e_W$ for both the off-grid VFI and the EGM while actually increasing the error for Time Iteration. Meanwhile, the error remains identical for on grid VFI. Therefore, the asset grid itself sets the error $e_W$ only for on-grid VFI while the stopping rule determines the error for the other investigated methods. 
+The tightening in the convergence criteria by a factor of 100 decreases the policy error $e_W$ for both the off-grid VFI and the EGM while actually increasing the error for Time Iteration. Meanwhile, the error remains identical for on-grid VFI. Therefore, the asset grid itself appears to determine the error $e_W$ for on-grid VFI, while the stopping rule affects the accuracy of off-grid VFI and EGM. For Time Iteration, however, the increase in error suggests that the relationship is less straightforward. 
 
 ### Question 2.2.d: 
 
@@ -67,11 +69,11 @@ with the following values reported:
 | Time iteration | 272 | 4.20 | 15.45 | $1.7 \cdot 10^{-4}$ | -4.7 |
 | EGM | 272 | 0.28 | 1.04 | $2.8 \cdot 10^{-6}$ | -6.6 |
 
-For the purpose of accuracy of the results, all methods except for VFI on the grid can be trusted up to three decimal digits as their maximum Euler equation error is at least in the $10^{-4}$ range. 
+For the purpose of accuracy of the results, I would trust all methods except for VFI on the grid to approximately three decimal digits, based on their maximum Euler equation errors. EGM appears to offer even higher accuracy. However, as the Euler equation error does not directly measure the consumption-policy error, these estimates cannot guarantee the exact number of correct digits.
 
-When we compare the results to the CARA model where we know the exact solution, we can observe that the both the maximum Euler error and the mean euler error are larger in the CRRA model than in the CARA benchmark, subsequently performing relatively worse under CRRA than under CARA. However, these differences can be explained by the introduction of a potentially binding borrowing constraint, a different income grid caused by recomputation of the income process, and the different utility function. 
+When we compare the results to the CARA model where we know the exact solution, we can observe that the Euler equation errors are generally larger in the CRRA model than in the CARA benchmark, although EGM reports a lower mean log Euler error under CRRA. These differences may be related to the introduction of a potentially binding borrowing constraint, a different income grid caused by recomputation of the income process, and the different utility function.
 
-However, for this CRRA model, EGM can be preferred as the computed policy function is accurate for the first five decimal digits and takes the least amount of time to complete its computations. 
+For this CRRA model, EGM can therefore be preferred as it reports the lowest Euler equation errors and takes the least amount of time to complete its computations.
 
 ### Question 3.3.:
 For 1.5 to 2 % of all asset states in the lowest two income states, all methods report that the borrowing constraint is binding and that households would prefer to take up debt if unconstrained. The binding borrowing constraint turns the Euler equation into an inequality as the Lagrange multiplier of the constraint is nonzero. 
