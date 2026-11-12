@@ -1,0 +1,18 @@
+# The hooks that run before every commit. setup_project.jl installs them (pre-commit install, once per clone).
+# rev pins the version of each hook. The julia-formatter hook runs the JuliaFormatter of your default Julia
+# environment (julia -e 'import JuliaFormatter; format(ARGS)'); setup_project.jl installs it there.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files  # data and results belong elsewhere, not in a 5 MB file in git
+        args: [--maxkb=5000]
+  - repo: https://github.com/JuliaEditorSupport/JuliaFormatter.jl
+    rev: v2.14.0
+    hooks:
+      - id: julia-formatter
+        files: \.jl$

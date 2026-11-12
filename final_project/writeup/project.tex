@@ -1,0 +1,65 @@
+% The write-up: five to eight pages, four parts. Compile from this folder with pdflatex after `julia --project=. run_all.jl`
+% has written output/. Every figure and every number comes from output/, nothing is retyped.
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage[colorlinks=true,linkcolor=black,urlcolor=blue,citecolor=black]{hyperref}
+
+\input{../output/tables/numbers.tex}   % the macros \rstar, \Kstar, \Kcm, \Kgain, \bisectionsteps, written by run_all.jl
+
+\title{Project title: what the project does, in one line}
+\author{Your name}
+\date{Computational Macro, University of Mannheim, HWS 2026}
+
+\begin{document}
+\maketitle
+
+\section{The model}
+
+The problem, the state, the Bellman equation, the parameters and where they come from. The template solves the
+Aiyagari (1994) economy of session 6: households with CRRA utility ($\gamma = 2$, $\beta = 0.96$) face
+idiosyncratic income risk on a Rouwenhorst chain with seven states ($\rho = 0.9$, $\sigma_\varepsilon = 0.2$) and
+a borrowing limit $a \geq 0$; a firm with $Y = K^\alpha L^{1 - \alpha}$ ($\alpha = 0.36$, $\delta = 0.08$) rents
+their savings as capital.
+\begin{equation}
+    v(a, z) = \max_{a' \geq 0} \; u\bigl(w z + (1 + r) a - a'\bigr) + \beta \, \mathbb{E}\bigl[v(a', z') \mid z\bigr].
+\end{equation}
+
+\section{The method}
+
+Which of the methods of the course you use and why this one, grids, tolerances, and the accuracy check you ran.
+The template uses the endogenous grid method on $200$ quadratically spaced asset grid points, Young's method
+for the stationary distribution, and bisection on the interest rate; the inner tolerances ($10^{-8}$ on the
+policy, $10^{-12}$ on the distribution) sit below the outer one ($10^{-6}$ on $r$). The accuracy check is the
+Monte Carlo simulation of Table~\ref{tab:equilibrium}: its mean lies within two standard errors of Young's.
+
+\section{Results}
+
+The figures and tables from \texttt{output/}, and what they say. The equilibrium interest rate is
+$r^* = \rstar$~percent after \bisectionsteps{} bisection steps, the capital stock $K^* = \Kstar$ against
+$\Kcm$ under complete markets: precautionary saving raises capital by \Kgain~percent.
+
+\begin{table}[h]
+    \centering
+    \caption{The stationary equilibrium of the baseline economy}
+    \label{tab:equilibrium}
+    \input{../output/tables/equilibrium.tex}
+\end{table}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{../output/figures/wealth.pdf}
+    \caption{The wealth distribution at $r^*$ (left) and its Lorenz curve (right).}
+    \label{fig:wealth}
+\end{figure}
+
+\section{What next}
+
+What the extension cannot answer yet, and what it would take, in a few sentences.
+
+\end{document}

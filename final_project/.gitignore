@@ -1,0 +1,15 @@
+# LaTeX build files of the write-up (the PDF itself is committed)
+writeup/*.aux
+writeup/*.log
+writeup/*.out
+writeup/*.toc
+writeup/*.synctex.gz
+writeup/*.fdb_latexmk
+writeup/*.fls
+
+# notebooks for exploring only
+.ipynb_checkpoints/
+
+# editor and OS files
+.DS_Store
+Thumbs.db

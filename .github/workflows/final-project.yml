@@ -1,0 +1,80 @@
+# The check of the final project: after every push that touches the project, GitHub runs it on a clean machine.
+# A green tick on the commit means: the code is formatted, run_all.jl reproduces every figure and table from
+# scratch with the packages of Manifest.toml, the smoke test passes, and the write-up compiles. The reproduced
+# output and write-up can be downloaded from the run (Artifacts). You do not need to change this file.
+name: final project
+
+on:
+  push:
+    paths:
+      - "final_project/**"
+      - ".github/workflows/final-project.yml"
+      - ".pre-commit-config.yaml"
+      - ".JuliaFormatter.toml"
+  workflow_dispatch:  # the button "Run workflow" in the Actions tab
+
+permissions:
+  actions: write  # julia-actions/cache deletes its old caches
+  contents: read
+
+env:
+  GKSwstype: "100"  # Plots writes files without a display
+  JULIAFORMATTER_VERSION: "2.14.0"  # as in setup_project.jl
+
+jobs:
+  reproduce:
+    name: formatted, reproduces, test passes, write-up compiles
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: The Julia version of Manifest.toml
+        id: julia
+        run: |
+          v=$(sed -n 's/^julia_version = "\(.*\)"$/\1/p' final_project/Manifest.toml 2>/dev/null)
+          echo "version=${v:-1.10}" >> "$GITHUB_OUTPUT"
+
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ steps.julia.outputs.version }}
+
+      - uses: julia-actions/cache@v2
+
+      - name: Formatting (the pre-commit hooks, on the files of the project)
+        run: |
+          julia -e 'using Pkg; try Pkg.add(name="JuliaFormatter", version=ENV["JULIAFORMATTER_VERSION"]) catch; Pkg.add("JuliaFormatter") end'
+          git ls-files -z final_project | { grep -zv '^final_project/formatting_demo/' || true; } |
+            xargs -0 -r pipx run pre-commit run --show-diff-on-failure --color=always --files
+
+      - name: run_all.jl from scratch
+        run: |
+          if [ -d final_project/output ]; then find final_project/output -type f ! -name .gitkeep -delete; fi
+          julia --project=final_project final_project/run_all.jl
+
+      - name: Are the committed tables those of the code?
+        run: |
+          if ! git diff --quiet -- final_project/output/tables; then
+            echo "::warning::output/tables in the repository differ from a fresh run of run_all.jl. Run it, compile the write-up, commit both."
+            git diff --stat -- final_project/output/tables
+          fi
+
+      - name: Smoke test
+        run: julia --project=final_project final_project/test/runtests.jl
+
+      - name: Write-up
+        if: hashFiles('final_project/writeup/project.tex') != ''
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: project.tex
+          working_directory: final_project/writeup
+
+      - name: Keep the reproduced output and write-up
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reproduced-output
+          path: |
+            final_project/output
+            final_project/writeup/project.pdf
+          if-no-files-found: ignore

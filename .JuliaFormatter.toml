@@ -1,0 +1,4 @@
+# Settings of JuliaFormatter, at the root of the repository. Read whenever the formatter runs here: from the REPL,
+# from VS Code, or from the pre-commit hook, so everybody formats alike.
+style = "blue"
+margin = 110
